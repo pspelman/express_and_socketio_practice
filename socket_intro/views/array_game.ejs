@@ -1,0 +1,120 @@
+<html>
+<head>
+    <title>Signal user form</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type ="text/javascript">
+
+        function draw_board(board_array) {
+            console.log(`drawing the board with`, board_array);
+
+
+            //    make HTML string creator
+            var board_string = function(board_array) {
+                let board = "";
+                for (let i = 0; i < board_array.length; i++) {
+                    var class_string = ['block neutral','block p1', 'block p2'];
+                    board += `<div class='${class_string[board_array[i]]}' ></div>`;
+                }
+                return board;
+            };
+
+            console.log(`board string: ${board_string(board_array)} `);
+            $('#game_space').html(board_string(board_array));
+
+        }
+
+        $(document).ready(function () {
+
+            var socket = io.connect();
+            socket.on("show_move", function (data) {
+                console.log(`someone made a move: `);
+            });
+            socket.on("someone_submitted_stuff", function (data) {
+                console.log(`Someone submitted things!`);
+                $('body').append(`<p>${JSON.stringify(data.user_info.name)}: ${JSON.stringify(data.user_info.message)} </p>`);
+            });
+
+            socket.on("update_board", function (data) {
+                console.log(`recieved updated board`);
+                console.log(data.board);
+                draw_board(data.board);
+            });
+
+            //make board array creator (naked board)
+            var board_array = [];
+            var game_spaces_wide = 5;
+            for (let i = 0; i < game_spaces_wide; i++) {
+                board_array.push(0);
+            }
+            //manually add a player
+            board_array.push(1);
+            console.log(`board array: ${board_array} `);
+            console.log(board_array);
+
+            $('#left').click(function () {
+                console.log(`trying to move left `);
+                socket.emit('move_left', {board: board_array});
+            });
+
+            $('#right').click(function () {
+                console.log(`trying to move right `);
+                socket.emit('move_right', {board: board_array});
+            });
+
+        })
+
+
+        // need to make the board on the server, so that it can be managed by server
+        // request the board via socket
+        //     board_string = function () {
+        //         socket.emit('get_board');
+        //     };
+
+        // need to draw the board here
+
+
+
+        // //    make HTML string creator
+        // var board_string = function(board_array) {
+        //     let board = "";
+        //     for (let i = 0; i < board_array.length; i++) {
+        //         var class_string = ['block neutral','block p1', 'block p2'];
+        //         board += `<div class='${class_string[board_array[i]]}' ></div>`;
+        //     }
+        //     // board += `<div class='block p1' ></div>`;
+        //
+        //
+        //     return board;
+        // };
+        //     console.log(`board string: ${board_string(board_array)} `);
+        //     $('#game_space').append(board_string(board_array));
+        // })
+
+
+    </script>
+
+</head>
+
+<body>
+<h2>
+    Welcome to the form page
+</h2>
+<h1 id="lucky_data">Lucky</h1>
+<div id="game_space">
+
+</div>
+
+<button id="left"><- Left</button>
+<button id="right">Right -></button>
+</div>
+<br/>
+
+<!-- /end #contact-form -->
+
+
+<hr/>
+
+</body>
+</html>

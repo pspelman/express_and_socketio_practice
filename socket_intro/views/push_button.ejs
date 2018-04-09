@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Push Button</title>
+
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<!--bring in socket.io-->
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type ="text/javascript">
+<!--connect to the socket-->
+    //set the var to use as the function later
+    var button_press;
+    var button_reset;
+
+    $(document).ready(function () {
+        var socket = io.connect();
+
+        socket.on('update_count', function (count_data) {
+            console.log(`recieved update count ${count_data.count} `);
+            console.log(count_data);
+
+            $('#button_count').text(count_data.count);
+
+        });
+
+        button_press = function () {
+            console.log(`button pressed on page`);
+            socket.emit('button_press');
+        };
+        button_reset = function () {
+            console.log(`button pressed on page`);
+            socket.emit('button_reset');
+        };
+
+
+    });
+
+    </script>
+        </head>
+<body>
+<div class="container">
+    <h2>
+        The button has been pushed <span id="button_count"></span> times
+    </h2>
+
+    <h4>Push the button to update the count!</h4>
+
+    <button class="button" onclick="button_press()">Press the button!</button>
+    <br/>
+    <button class="button reset" onclick="button_reset()">Reset</button>
+
+
+
+</div>
+
+
+</body>
+</html>

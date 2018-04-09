@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Push Button</title>
+
+    <link rel="stylesheet" href="/css/chat_styles.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!--bring in socket.io-->
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script>
+    </script>
+    <script type ="text/javascript">
+
+        <!--connect to the socket-->
+        //set the var to use as the function later
+        var button_press;
+        var button_reset;
+        //set the name
+
+
+    $(document).ready(function () {
+
+        var name = prompt('What is your name?');
+
+            //    set the listener
+        $('#chat_form').submit(function () {
+            //don't let the form try to change the page
+            event.preventDefault();
+
+            var $inputs = $('#chat_form :input');
+            var user_data ={};
+            $inputs.each(function () {
+                user_data[this.name] = $(this).val();
+            });
+            console.log(`data acquired:`, user_data);
+
+            });
+            //populate the connected users
+            // $('.container').append(name);
+            var show_connected_users = function (users_array) {
+                let connected_users_string = "connected users string";
+                //build the string of all connected users
+                $('.connected_users_div').append(users_array);
+            };
+            //should be recieving the connected users array from the server
+
+    //CONNECT TO THE SOCKET
+    var socket = io.connect();
+    //EMIT NEW NAME TO SERVER
+    socket.emit('new_user_entered_chat', {name:name});
+
+        show_connected_users("jill");
+        //
+
+            socket.on('connected_users_list', function (data) {
+                let user_list = data.user_list;
+                console.log(`recieved user list:`, user_list);
+
+                connected_users.push(name);
+                console.log(`connected users`, connected_users);
+
+                //add all the current users to the side-chat
+                // connected_users += "Phil";
+
+                show_connected_users(connected_users);
+            });
+
+            socket.on('new_chat', function (chat_data) {
+                console.log(`chat recieved: `, chat_data);
+
+            });
+
+            //
+            //
+            // socket.on('update_count', function (count_data) {
+            //     console.log(`recieved update count ${count_data.count} `);
+            //     console.log(count_data);
+            //     $('#button_count').text(count_data.count);
+            // });
+            // button_press = function () {
+            //     console.log(`button pressed on page`);
+            //     socket.emit('button_press');
+            // };
+            // button_reset = function () {
+            //     console.log(`button pressed on page`);
+            //     socket.emit('button_reset');
+            // };
+        });
+    </script>
+    <script>
+
+    </script>
+</head>
+<body>
+<div class="container">
+
+    <h2>
+        CHATROOM!<br/>
+        The button has been pushed <span id="button_count"></span> times
+    </h2>
+    <div class="connected_users_div">
+        <h1>Connected users:</h1>
+
+    </div>
+
+    <div class="chatbox">
+        <h3>Chattes go in here</h3>
+
+        <!--maybe a for loop through all the chats-->
+        <% data %>
+        <table id="chat_log">
+            <tr>
+                <td>[USER] :</td>
+                <td>This is my message that I left. Sincerely, User.</td>
+            </tr>
+        </table>
+
+    </div>
+    <div class="chat_form_div">
+        <form id="chat_form" method="post" action="/">
+            <fieldset>
+                <!--<label for="message">Question/Comment:</label><br/>-->
+                <textarea name="message"></textarea><br/>
+                <input type="submit" name="submit" id="submit" value="Send"/>
+            </fieldset>
+        </form>
+    </div>
+
+    <!--<button class="button" onclick="button_press()">Press the button!</button>-->
+    <!--<br/>-->
+    <!--<button class="button reset" onclick="button_reset()">Reset</button>-->
+</div>
+
+</body>
+</html>

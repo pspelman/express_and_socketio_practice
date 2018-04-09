@@ -1,0 +1,127 @@
+<html>
+<head>
+    <title>Signal user form</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type ="text/javascript">
+
+        $(document).ready(function () {
+
+            var socket = io.connect();
+            $('#lucky_data').hide();
+
+            // $('#submit').click(function () {
+            //     console.log(`trying to submit user data `);
+            //
+            //     socket.emit('user_data_submission', {description: "user data submission from the user form"});
+            //
+            // });
+
+            $('#user_form').submit(function() {
+
+                event.preventDefault();
+                console.log(`Submitting the user_form`);
+
+                // get all the inputs into an array.
+                var $inputs = $('#user_form :input');
+
+                // not sure if you wanted this, but I thought I'd add it.
+                // get an associative array of just the values.
+                var user_data = {};
+                $inputs.each(function() {
+                    user_data[this.name] = $(this).val();
+                });
+                console.log(`user_data:`, user_data);
+                socket.emit('posting_form', {data: user_data});
+                // socket.emit('posting_form', {data: user_data, description: "user data submission from the user form"});
+            });
+
+            // when the data come back
+            socket.on("show_submission", function (data) {
+                console.log(`user info submitted, came back from server: `);
+                console.log(data.user_info);
+                // $('body').append("HELLO!!!!");
+                var append_string = `Your info >>\n Name: ${data.user_info.name}\nLocation: ${data.user_info.location}\nLanguage: ${data.user_info.language}`
+                $('#submitted_info').append(append_string);
+
+                // $('body').append(JSON.stringify(data.user_info));
+                $('#lucky_data').show();
+                $('#lucky_data').append(JSON.stringify(data.lucky_number));
+                $('#lucky_data').text = data.lucky_number;
+            });
+
+            socket.on("someone_submitted_stuff", function (data) {
+                console.log(`Someone submitted things!`);
+                // $('body').append(`<p>${JSON.stringify(data.user_info.name)}: ${JSON.stringify(data.user_info.message)} </p>`);
+                $('body').append(`<p>${data.user_info.name}: ${data.user_info.message} </p>`);
+
+            });
+
+
+
+        })
+    </script>
+
+</head>
+
+<body>
+<div id="submitted_info">
+</div>
+<h2>
+    Welcome to the form page
+</h2>
+<h1 id="lucky_data">Lucky</h1>
+
+<div id="contact-form">
+
+    <form id="user_form" method="post" action="/">
+        <fieldset>
+
+            <label for="name">Name: </label>
+            <input type="text" name="name"><br/>
+
+
+
+            <label for="location">Location: </label>
+            <select id="location" name="location">
+                <optgroup label="location_options">
+                    <option>Seattle</option>
+                    <option>Tokyo</option>
+                    <option>Spain</option>
+                    <option>New York</option>
+                </optgroup>
+            </select>
+            <br/>
+
+            <label for="language">Fave lang: </label>
+            <select id="language" name="language">
+                <optgroup label="language options">
+                    <option>Java</option>
+                    <option>MEAN</option>
+                    <option>Python</option>
+                    <option>C#</option>
+                </optgroup>
+            </select>
+            <br/>
+
+            <!--<label for="website">Website: </label>-->
+            <!--<input type="url" name="url"><br/>-->
+
+            <label for="message">Question/Comment:</label><br/>
+            <textarea name="message"></textarea><br/>
+
+            <input type="submit" name="submit" id="submit" value="Send Message"/>
+
+        </fieldset>
+    </form>
+</div>
+<br/>
+Chats down here:<br/>
+<!-- /end #contact-form -->
+
+
+<hr/>
+
+</body>
+</html>

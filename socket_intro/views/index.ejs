@@ -1,0 +1,108 @@
+<html>
+<head>
+    <title></title>
+    <link rel='stylesheet' href='/css/styles.css' />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type ="text/javascript">
+        var add_div;
+
+        $(document).ready( function (){
+            // this triggers the connection event in our server!
+            // $('#add_div').click(function () {
+            //     console.log(`clicked the add div button`);
+            //     add_div();
+            //     // $(document).body.append('<div class=box></div>');
+            // });
+            var boxes = 0;
+
+            function random_rgba() {
+                var o = Math.round, r = Math.random, s = 255;
+                return 'rgba(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ',' + r().toFixed(1) + ')';
+            }
+
+            add_div = function () {
+                //emit a signal to the server!
+
+                socket.emit('pretty_box', {insight: "someone called the add_div() function"});
+
+                if (boxes > 100){
+                    $('.boxes').html(`<div class=box style='background-color:${random_rgba()};'></div>`);
+                    boxes = 0;
+                } else {
+                    boxes ++;
+                    $('.boxes').append(`<div class=box style='background-color:${random_rgba()};'></div>`);
+                }
+                // $(document.body).append("<div class=box></div>");
+            }
+
+            var socket  = io.connect();
+            // we'll write all the socket stuff after the above line!
+            $('button').click(function () {
+                socket.emit( "button_clicked", {reason: "because I want to learn about sockets!"});
+            });
+            socket.on('server_response', function (data) {
+                console.log(`The server says: ` + data.response);
+            });
+
+            //define my commands function
+            var commands = {
+                log: function (param) {
+                    console.log(param);
+                },
+                signal: function (param) {
+                    console.log(param);
+                    let random_color = random_rgba();
+                    console.log(`random color ${random_color} `);
+
+                    add_div();
+                    // $(document).body.append('<div class=box></div>');
+                    // window.open(document.URL, '_blank', "'location='"+ param + "'");
+                    // window.open(document.URL, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+                },
+
+            };
+
+            socket.on('executecommand_loop', function (data) {
+                var delay = data.delay;
+                var commandName = data.commandName;
+                var param = data.param;
+
+
+            });
+
+            socket.on('executecommand', function (data) {
+                var a = 'foo Foo FOOOOOO';
+                console.log(`data:`, data);
+
+                var param = data.location
+                commands[data.commandName](param);
+                // commands[data.commandName](a);
+
+            });
+
+        })
+        //Now adding some functionality for the socket connection w/the button on the page
+    </script>
+</head>
+<body>
+<button>I AM A BUTTON!</button>
+<a onclick="window.open(document.URL, '_blank', 'location=yes,height=200,width=200,left=20,scrollbars=yes,status=yes');">
+    Share Page
+</a>
+
+<button onclick='add_div()' >Add Div!</button>
+
+<!--<a onclick="$('body').append('<div class=box></div>')">-->
+    <!--ADD TO BODY-->
+<!--</a>-->
+
+
+<div class="container">
+    <h1>hello...</h1>
+    <div class="boxes"></div>
+</div>
+
+<!-- web page goes here -->
+</body>
+</html>

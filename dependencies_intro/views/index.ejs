@@ -1,0 +1,20 @@
+<html>
+<body>
+<h2>
+Welcome to the count page
+</h2>
+<h1>
+    <%= session.counter %> visits and counting...
+</h1>
+
+<form action="/plus_two" method="post">
+    <button type="submit" value="Counter +2" >+2 Visits!</button>
+</form>
+<form action="/reset" method="post">
+    <button type="submit" value="reset" >RESET!</button>
+</form>
+
+<hr/>
+
+</body>
+</html>
